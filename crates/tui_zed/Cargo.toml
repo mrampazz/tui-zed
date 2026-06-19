@@ -21,6 +21,7 @@ futures = "0.3"
 # Our crates
 async_executor.workspace = true
 text_style.workspace = true
+tui_syntax_theme.workspace = true
 
 # External
 anyhow.workspace = true

@@ -19860,6 +19860,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tui_syntax_theme"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "text_style",
+]
+
+[[package]]
 name = "tui_zed"
 version = "0.1.0"
 dependencies = [
@@ -19871,6 +19880,7 @@ dependencies = [
  "ratatui",
  "text_style",
  "tokio",
+ "tui_syntax_theme",
 ]
 
 [[package]]

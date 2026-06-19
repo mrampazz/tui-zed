@@ -1,0 +1,17 @@
+[package]
+name = "tui_syntax_theme"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/syntax_theme.rs"
+doctest = false
+
+[features]
+bundled-themes = ["dep:serde", "dep:serde_json"]
+
+[dependencies]
+text_style.workspace = true
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
