@@ -19874,13 +19874,17 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async_executor",
+ "clock",
  "crossterm",
  "futures 0.3.32",
  "log",
  "ratatui",
+ "rope",
+ "text",
  "text_style",
  "tokio",
  "tui_syntax_theme",
+ "unicode-width",
 ]
 
 [[package]]

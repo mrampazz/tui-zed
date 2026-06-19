@@ -23,6 +23,12 @@ async_executor.workspace = true
 text_style.workspace = true
 tui_syntax_theme.workspace = true
 
+# Zed crates (GPUI-free)
+clock.workspace = true
+rope.workspace = true
+text.workspace = true
+
 # External
 anyhow.workspace = true
 log = "0.4"
+unicode-width = "0.2"
