@@ -1,0 +1,14 @@
+[package]
+name = "text_style"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+path = "text_style.rs"
+
+[dependencies]
+anyhow.workspace = true
+derive_more.workspace = true
+schemars.workspace = true
+serde.workspace = true

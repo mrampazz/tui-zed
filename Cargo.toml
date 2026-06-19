@@ -12,6 +12,7 @@ members = [
     "crates/agent_ui",
     "crates/ai_onboarding",
     "crates/anthropic",
+    "crates/async_executor",
     "crates/askpass",
     "crates/assets",
     "crates/audio",
@@ -202,6 +203,7 @@ members = [
     "crates/terminal",
     "crates/terminal_view",
     "crates/text",
+    "crates/text_style",
     "crates/theme",
     "crates/theme_extension",
     "crates/theme_settings",
@@ -210,6 +212,7 @@ members = [
     "crates/time_format",
     "crates/title_bar",
     "crates/toolchain_selector",
+    "crates/tui_zed",
     "crates/ui",
     "crates/ui_input",
     "crates/ui_macros",
@@ -277,6 +280,7 @@ agent_skills = { path = "crates/agent_skills" }
 agent_ui = { path = "crates/agent_ui" }
 ai_onboarding = { path = "crates/ai_onboarding" }
 anthropic = { path = "crates/anthropic" }
+async_executor = { path = "crates/async_executor" }
 askpass = { path = "crates/askpass" }
 assets = { path = "crates/assets" }
 audio = { path = "crates/audio" }
@@ -459,6 +463,8 @@ telemetry_events = { path = "crates/telemetry_events" }
 terminal = { path = "crates/terminal" }
 terminal_view = { path = "crates/terminal_view" }
 text = { path = "crates/text" }
+text_style = { path = "crates/text_style" }
+tui_zed = { path = "crates/tui_zed" }
 theme = { path = "crates/theme" }
 theme_extension = { path = "crates/theme_extension" }
 theme_settings = { path = "crates/theme_settings" }
