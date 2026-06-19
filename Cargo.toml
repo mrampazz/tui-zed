@@ -212,6 +212,7 @@ members = [
     "crates/time_format",
     "crates/title_bar",
     "crates/toolchain_selector",
+    "crates/tui_lsp",
     "crates/tui_zed",
     "crates/ui",
     "crates/ui_input",
@@ -464,6 +465,7 @@ terminal = { path = "crates/terminal" }
 terminal_view = { path = "crates/terminal_view" }
 text = { path = "crates/text" }
 text_style = { path = "crates/text_style" }
+tui_lsp = { path = "crates/tui_lsp" }
 tui_zed = { path = "crates/tui_zed" }
 theme = { path = "crates/theme" }
 theme_extension = { path = "crates/theme_extension" }

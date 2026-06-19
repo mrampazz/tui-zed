@@ -19841,6 +19841,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "tui_lsp"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "collections",
+ "futures 0.3.32",
+ "log",
+ "lsp-types",
+ "parking_lot",
+ "postage",
+ "schemars 1.0.4",
+ "serde",
+ "serde_json",
+ "smol",
+ "tokio",
+ "util",
+]
+
+[[package]]
 name = "tui_zed"
 version = "0.1.0"
 dependencies = [
