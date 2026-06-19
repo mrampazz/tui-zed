@@ -30,5 +30,7 @@ text.workspace = true
 
 # External
 anyhow.workspace = true
+ignore.workspace = true
+imara-diff.workspace = true
 log = "0.4"
 unicode-width = "0.2"

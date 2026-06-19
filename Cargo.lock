@@ -19877,6 +19877,8 @@ dependencies = [
  "clock",
  "crossterm",
  "futures 0.3.32",
+ "ignore",
+ "imara-diff",
  "log",
  "ratatui",
  "rope",

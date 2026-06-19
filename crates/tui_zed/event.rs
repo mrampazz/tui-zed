@@ -25,6 +25,11 @@ pub enum Action {
 
     // File
     Save,
+    OpenFileFinder,
+
+    // Panels
+    ToggleFileTree,
+    FocusEditor,
 
     // App
     Quit,
@@ -42,6 +47,13 @@ pub fn map_key_event(key: KeyEvent) -> Option<Action> {
 
         // Save
         (KeyCode::Char('s'), true, _) => Some(Action::Save),
+
+        // File finder
+        (KeyCode::Char('p'), true, _) => Some(Action::OpenFileFinder),
+
+        // File tree
+        (KeyCode::Char('b'), true, _) => Some(Action::ToggleFileTree),
+        (KeyCode::Char('e'), true, _) => Some(Action::FocusEditor),
 
         // Undo / Redo
         (KeyCode::Char('z'), true, false) => Some(Action::Undo),
@@ -66,7 +78,7 @@ pub fn map_key_event(key: KeyEvent) -> Option<Action> {
         (KeyCode::Delete, false, _) => Some(Action::Delete),
         (KeyCode::Tab, false, _) => Some(Action::Tab),
 
-        // Character input (only when ctrl is not held, except for ctrl combos above)
+        // Character input
         (KeyCode::Char(c), false, _) => Some(Action::InsertChar(c)),
 
         _ => None,
