@@ -6,6 +6,146 @@ be parallelized.
 
 ---
 
+## Progress Tracker
+
+**Branch:** `tui-zed/phase-0-infrastructure`
+**Approach change:** Instead of decoupling Zed's crates with feature flags (as originally planned), we **copy/fork** the needed code into our own crates, stripping GPUI entirely. Zed's existing crates are never modified. GPUI-free Zed crates (`text`, `rope`, `sum_tree`, `clock`, `collections`, `util`) are used directly as workspace dependencies.
+
+### Phase 0: Infrastructure — DONE
+
+| Task | Status | Crate | Notes |
+|------|--------|-------|-------|
+| 0.1 Create `text_style` | **Done** | `crates/text_style/` | Copied `Pixels`, `Hsla`, `Rgba`, `FontWeight`, `FontStyle`, `UnderlineStyle`, `StrikethroughStyle`, `HighlightStyle` from gpui. 7 tests. |
+| 0.2 Create `async_executor` | **Done** | `crates/async_executor/` | `Executor` trait + `TokioExecutor` impl. 3 tests. |
+| 0.3 Create `tui_zed` binary | **Done** | `crates/tui_zed/` | tokio event loop + crossterm input + ratatui rendering. |
+
+### Phase 1: LSP Client — DONE
+
+| Task | Status | Crate | Notes |
+|------|--------|-------|-------|
+| 1.1-1.6 Fork & strip LSP crate | **Done** | `crates/tui_lsp/` | Forked `crates/lsp/` (~1800 lines of JSON-RPC protocol logic). Replaced `BackgroundExecutor` → `tokio::runtime::Handle`, `Task<T>` → `JoinHandle<T>`, `AsyncApp` removed from handlers, `SharedString` → `Arc<str>`, `&App` globals → explicit params. 1 test. |
+
+**Deviation from plan:** Instead of adding feature flags to the original `lsp` crate, we forked it into `tui_lsp`. The original crate is untouched.
+
+### Phase 2: Syntax Theme — DONE
+
+| Task | Status | Crate | Notes |
+|------|--------|-------|-------|
+| 2.1 Fork `syntax_theme` | **Done** | `crates/tui_syntax_theme/` | Replaced all `gpui::` type imports with `text_style::` equivalents. Full API preserved. 2 tests. |
+| 2.8 Create TuiTheme mapping | **Done** | `crates/tui_zed/theme.rs` | Converts `HighlightStyle`/`Hsla` → `ratatui::Style`. Maps font weight→BOLD, font style→ITALIC, underline→UNDERLINED, strikethrough→CROSSED_OUT, HSLA→truecolor RGB. 4 tests. |
+
+**Skipped:** Tasks 2.2-2.7 (decoupling the `language` crate) were deferred. The `language` crate has deep GPUI coupling (`Entity<Buffer>`, `Context<Self>`, `EventEmitter`, `Task`). Instead of forking it now, we use `text::Buffer` directly for Phase 3.
+
+### Phase 3: Editor Core — DONE
+
+| Task | Status | File | Notes |
+|------|--------|------|-------|
+| 3.7 Build TuiEditor | **Done** | `crates/tui_zed/editor.rs` | Built directly on `text::Buffer` (Zed's GPUI-free rope+CRDT buffer). Cursor movement (all directions, line start/end, doc start/end, page up/down), text editing (insert, backspace, delete, newline, tab), undo/redo, auto-scroll. 13 tests. |
+| 3.8 Build ratatui editor widget | **Done** | `crates/tui_zed/app.rs` | Line numbers in gutter, cursor rendering, horizontal scroll, status bar. |
+
+**Deviation from plan:** Instead of extracting `EditorState` from Zed's `editor::Editor` (127k lines, deeply GPUI-coupled), we built a lightweight `TuiEditor` struct directly on `text::Buffer`. This gives us the rope data structure, transactional undo/redo, Point/offset conversions, and anchor system — without any GPUI dependency. Multi-cursor, display pipeline, and advanced selection operations from Zed's editor can be integrated later.
+
+### Phase 4: Git, File Tree, Fuzzy Finder — DONE
+
+| Task | Status | File | Notes |
+|------|--------|------|-------|
+| 4.1 Git operations | **Done** | `crates/tui_zed/git.rs` | Shells out to `git` CLI. Status, branch, HEAD text retrieval. Diff hunks via `imara-diff` for gutter markers (added/modified/removed). 4 tests. |
+| 4.2 File tree panel | **Done** | `crates/tui_zed/file_tree.rs` | `.gitignore`-aware traversal via `ignore` crate. Expand/collapse dirs, keyboard nav, git status colors on entries. Toggle with Ctrl+B. |
+| 4.3 Fuzzy file finder | **Done** | `crates/tui_zed/file_finder.rs` | Centered overlay popup (Ctrl+P). Fuzzy subsequence matching. `.gitignore`-aware file scanning. 1 test. |
+| 4.4 Status bar | **Done** | `crates/tui_zed/app.rs` | Mode indicator, filename, modified flag, cursor position, line count, git branch. |
+| 4.5 Tab bar | Not started | — | Multi-buffer tab management not yet implemented. |
+| 4.6 Settings system | Not started | — | TOML config not yet implemented. |
+
+### Phase 5: Integration & Polish — NOT STARTED
+
+| Task | Status | Notes |
+|------|--------|-------|
+| 5.1 Wire LSP into editor | Not started | `tui_lsp` crate is ready but not wired into the app yet |
+| 5.2 Completion popup | Not started | |
+| 5.3 Diagnostic rendering | Not started | |
+| 5.4 Command palette | Not started | |
+| 5.5 Search in file | Not started | |
+| 5.6 Search in project | Not started | |
+
+### Not Yet Started (from TUI_PLAN.md milestones)
+
+- Syntax highlighting via tree-sitter (requires forking `syntax_map.rs`)
+- LSP document sync, completions, diagnostics, go-to-definition, hover
+- Multi-cursor (add cursor above/below, select all matches)
+- Configurable keybindings (TOML)
+- Configurable themes (load Zed theme JSON)
+- Vim mode
+- Split panes
+- Code folding, soft wrapping
+- Mouse support
+
+### Test Summary
+
+| Crate | Tests |
+|-------|-------|
+| `text_style` | 7 |
+| `async_executor` | 3 |
+| `tui_lsp` | 1 |
+| `tui_syntax_theme` | 2 |
+| `tui_zed` (editor) | 13 |
+| `tui_zed` (theme) | 4 |
+| `tui_zed` (git) | 4 |
+| `tui_zed` (file_finder) | 1 |
+| **Total** | **35** |
+
+### Current Keybindings
+
+| Key | Action |
+|-----|--------|
+| Arrow keys | Cursor movement |
+| Home / End | Line start / end |
+| Ctrl+Home / Ctrl+End | Document start / end |
+| PgUp / PgDn | Page up / down |
+| Backspace / Delete | Delete char before / after cursor |
+| Enter | New line |
+| Tab | Insert 4 spaces |
+| Ctrl+Z | Undo |
+| Ctrl+Shift+Z / Ctrl+Y | Redo |
+| Ctrl+S | Save |
+| Ctrl+P | Open fuzzy file finder |
+| Ctrl+B | Toggle file tree / focus file tree |
+| Ctrl+E | Focus editor |
+| Ctrl+C / Ctrl+Q | Quit |
+| (In file tree) Up/Down | Navigate entries |
+| (In file tree) Enter | Open file / toggle directory |
+| (In file tree) Left | Collapse directory / go to parent |
+| (In file tree) Right | Expand directory / enter |
+| (In file tree) Esc | Return focus to editor |
+
+### Crate Dependency Graph
+
+```
+tui_zed (binary)
+├── text::Buffer (Zed, GPUI-free — rope + CRDT + undo/redo)
+│   ├── rope (Zed, GPUI-free)
+│   ├── sum_tree (Zed, GPUI-free)
+│   └── clock (Zed, GPUI-free)
+├── tui_syntax_theme (our fork of syntax_theme)
+│   └── text_style (our standalone style types)
+├── tui_lsp (our fork of lsp — NOT YET WIRED)
+├── ratatui + crossterm
+├── tokio
+├── ignore (gitignore-aware file traversal)
+├── imara-diff (diff computation for git gutter)
+└── tui_zed modules:
+    ├── editor.rs — TuiEditor (buffer, cursor, editing)
+    ├── app.rs — App (event loop, rendering, focus management)
+    ├── event.rs — Action enum + key mapping
+    ├── theme.rs — TuiTheme (Hsla → ratatui::Style)
+    ├── git.rs — GitRepo (status, branch, diff)
+    ├── file_tree.rs — FileTree (panel widget)
+    └── file_finder.rs — FileFinder (overlay widget)
+```
+
+**Zero GPUI in the final binary.**
+
+---
+
 ## Phase 0: Infrastructure
 
 ### Task 0.1 — Create the `text_style` crate
